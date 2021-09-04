@@ -1,9 +1,7 @@
 package com.burabayev;
 
+import com.burabayev.Calculate;
 import java.util.Scanner;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
-
 
 //        •	Калькулятор умеет выполнять операции сложения, вычитания, умножения и деления с двумя числами: a + b,
 // a - b, a * b, a / b.
@@ -33,8 +31,8 @@ import java.util.regex.Pattern;
 // 0+1 -> Exception()
 // 1-11 -> Exception()
 
-// I + V, X + V, V - X, I + II -> throw Exception()
-// I + 1, ... -> throw Exception()
+// V - X, ... -> throws Exception()
+// I + 1, ... -> throws Exception()
 // I + V, X + V, X - V, I + II -> VI, XV, V, III
 //
 
@@ -55,129 +53,5 @@ public class Main {
     }
 }
 
-class Calculate {
-    private final static RomeNumbersConverter romeNumbersConverter = new RomeNumbersConverter();
-    private final static String arithmethicOperators = "[\\/\\+\\-\\*]{1}";
 
-//     private String[] tokens;
-//     private int pos;
-    private String given;
-
-    private boolean isRomeNumbers = false;
-
-    enum ArithmethicOperation {
-        SUM, MINUS, MULTIPLE, DIVIDE
-    }
-    enum NumberType {
-        ROME, ARAB
-    }
-
-    Calculate(String given) {
-        this.given = given;
-//         this.tokens = given.split(" ");
-//         this.pos = 0;
-    }
-
-    private String[] getNumbers() {
-        return given.split(arithmethicOperators);
-    }
-
-    private ConvertResult toInt(String numberAsStr) throws Exception {
-        // написать mapper для римских чисел
-        try {
-            return new ConvertResult(Integer.parseInt(numberAsStr), NumberType.ARAB);
-        } catch (NumberFormatException e) {
-            int res = romeNumbersConverter.convertToArabNumber(numberAsStr);
-            isRomeNumbers = true;
-            return new ConvertResult(res, NumberType.ROME);
-        }
-    }
-
-    private ArithmethicOperation getArithmethicOperation() throws Exception {
-
-        Matcher matcher = Pattern
-                .compile(arithmethicOperators)
-                .matcher(this.given);
-        String operation = "";
-        if (matcher.find()) {
-            operation = matcher.group();
-        }
-
-        if (operation.equals("+")) {
-            return ArithmethicOperation.SUM;
-        } else if (operation.equals("-")) {
-            return ArithmethicOperation.MINUS;
-        } else if (operation.equals("*")) {
-            return ArithmethicOperation.MULTIPLE;
-        } else if (operation.equals("/")) {
-            return ArithmethicOperation.DIVIDE;
-        }
-        throw new Exception("Operation not found");
-    }
-
-    String getResult() throws Exception {
-        int res = calc();
-        if(isRomeNumbers) {
-            return romeNumbersConverter.convertToRomeNumber(res);
-        } else {
-            return String.valueOf(res);
-        }
-    }
-
-    private int calc() throws Exception {
-        String[] numbers = getNumbers();
-        ConvertResult convertResult1 = toInt(numbers[0]);
-        ConvertResult convertResult2 = toInt(numbers[1]);
-        int num1 = convertResult1.number;
-        int num2 = convertResult2.number;
-
-        if(convertResult1.numberType == convertResult2.numberType) {
-            if(convertResult1.numberType == NumberType.ARAB) {
-                isRomeNumbers = false;
-            } else {
-                isRomeNumbers = true;
-            }
-
-            if (
-                    num1 >= 1 && num1 <= 10
-                            && num2 >= 1 && num2 <= 10
-            ) {
-                ArithmethicOperation arithmethicOperation = getArithmethicOperation();
-                if (arithmethicOperation == ArithmethicOperation.SUM) {
-                    return num1 + num2;
-                } else if (arithmethicOperation == ArithmethicOperation.DIVIDE) {
-                    return num1 / num2;
-                } else if (arithmethicOperation == ArithmethicOperation.MINUS) {
-                    return num1 - num2;
-                } else if (arithmethicOperation == ArithmethicOperation.MULTIPLE) {
-                    return num1 * num2;
-                }
-            } else {
-                throw new IllegalArgumentException("Numbers are out of range[1;10]");
-            }
-        } else {
-            throw new Exception("Number types is different");
-        }
-        throw new Exception("Not found");
-    }
-
-    class ConvertResult {
-        private int number;
-        private NumberType numberType;
-
-        public ConvertResult(int number, NumberType numberType) {
-            this.number = number;
-            this.numberType = numberType;
-        }
-
-        public int getNumber() {
-            return number;
-        }
-
-        public NumberType getNumberType() {
-            return numberType;
-        }
-
-    }
-}
 
